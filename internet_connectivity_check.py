@@ -2,24 +2,24 @@ import sys
 import json
 import subprocess
 import requests
-from requests.exceptions import ConnectionError
 
-url = sys.argv[1].strip()
+# Read URL
+url = sys.argv[1].strip().strip("'").strip('"')
 
-# Fix URL formatting
-if not url.startswith("http"):
-    full_url = "https://" + url
+# Ensure full URL
+if not url.startswith("http://") and not url.startswith("https://"):
+    url_to_test = "https://" + url
 else:
-    full_url = url
+    url_to_test = url
 
 result = {
     "status": "disconnected",
-    "ping": None
+    "ping": "N/A"
 }
 
-# Try HTTP connection
+# Try HTTP connect
 try:
-    r = requests.get(full_url, timeout=5)
+    r = requests.get(url_to_test, timeout=5)
     result["status"] = "connected"
 except:
     print(json.dumps(result))
@@ -27,13 +27,17 @@ except:
 
 # Try ping
 try:
-    ping_cmd = ["ping", "-c", "1", url]
-    ping_output = subprocess.check_output(ping_cmd, universal_newlines=True)
+    ping_process = subprocess.run(
+        ["ping", "-c", "1", url],
+        capture_output=True,
+        text=True
+    )
+    output = ping_process.stdout
 
-    # Extract ping time
-    ping_time = ping_output.split("time=")[1].split(" ms")[0]
-    result["ping"] = ping_time
+    if "time=" in output:
+        ping_time = output.split("time=")[1].split(" ms")[0]
+        result["ping"] = ping_time
 except:
-    result["ping"] = "N/A"
+    pass
 
 print(json.dumps(result))
