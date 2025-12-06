@@ -1,24 +1,39 @@
-
+import sys
+import json
+import subprocess
 import requests
 from requests.exceptions import ConnectionError
 
-def internet_connection_test():
-	url = 'https://mail.goog232.com/'
-	print(f'Attempting to connect to {url} to determine internet connection status.')
+url = sys.argv[1].strip()
 
-	try:
-		print(url)
-		resp = requests.get(url, timeout = 10)
-		resp.text
-		resp.status_code
-		print(f'Connection to {url} was successful.')
-		return True
-	except ConnectionError as e:
-		requests.ConnectionError
-		print(f'Failed to connect to {url}.')
-		return False
-	except:
-		print(f'Failed with unparsed reason.')
-		return False
+# Fix URL formatting
+if not url.startswith("http"):
+    full_url = "https://" + url
+else:
+    full_url = url
 
-internet_connection_test()
+result = {
+    "status": "disconnected",
+    "ping": None
+}
+
+# Try HTTP connection
+try:
+    r = requests.get(full_url, timeout=5)
+    result["status"] = "connected"
+except:
+    print(json.dumps(result))
+    sys.exit()
+
+# Try ping
+try:
+    ping_cmd = ["ping", "-c", "1", url]
+    ping_output = subprocess.check_output(ping_cmd, universal_newlines=True)
+
+    # Extract ping time
+    ping_time = ping_output.split("time=")[1].split(" ms")[0]
+    result["ping"] = ping_time
+except:
+    result["ping"] = "N/A"
+
+print(json.dumps(result))
