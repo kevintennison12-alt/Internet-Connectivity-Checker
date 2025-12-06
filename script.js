@@ -1,23 +1,30 @@
-function checkConnection() {
-    let icon = document.getElementById("statusIcon");
-    let text = document.getElementById("statusText");
+function checkConnectivity() {
+    let url = document.getElementById("urlInput").value.trim();
 
-    icon.className = "status-icon checking";
-    text.innerHTML = "Checking connection...";
+    if (url === "") {
+        alert("Please enter a website URL");
+        return;
+    }
 
-    fetch("check.php")
+    // send request to backend
+    fetch("check.php?url=" + encodeURIComponent(url))
         .then(res => res.json())
         .then(data => {
+            let box = document.getElementById("resultBox");
+            let status = document.getElementById("statusText");
+            let ping = document.getElementById("pingText");
+
+            box.classList.remove("hidden");
+
             if (data.status === "connected") {
-                icon.className = "status-icon connected";
-                text.innerHTML = "Internet Connected ✔";
-            } else {
-                icon.className = "status-icon disconnected";
-                text.innerHTML = "No Internet ❌";
+                box.className = "result success";
+                status.innerHTML = "✔ Connection Established";
+                ping.innerHTML = "Ping: " + data.ping + " ms";
+            } 
+            else {
+                box.className = "result error";
+                status.innerHTML = "❌ Connection Failed";
+                ping.innerHTML = "Unable to reach website.";
             }
-        })
-        .catch(() => {
-            icon.className = "status-icon disconnected";
-            text.innerHTML = "No Internet ❌";
         });
 }
