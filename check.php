@@ -1,9 +1,9 @@
 <?php
-$output = shell_exec("python3 internet_connectivity_check.py 2>&1");
+$url = $_GET["url"];
 
-if (strpos($output, "successful") !== false) {
-    echo json_encode(["status" => "connected"]);
-} else {
-    echo json_encode(["status" => "disconnected"]);
-}
+$cmd = "python3 check_connectivity.py " . escapeshellarg($url);
+
+$output = shell_exec($cmd);
+
+echo $output; // Python script already returns JSON
 ?>
