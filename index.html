@@ -2,20 +2,23 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Internet Connectivity Checker</title>
+    <title>Website Connectivity Checker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
     <div class="card">
-        <h2>🌐 Internet Status Checker</h2>
-        <p class="subtitle">Click the button to test your internet connection</p>
+        <h2>🌐 Internet Connectivity Checker</h2>
 
-        <div id="statusIcon" class="status-icon idle"></div>
-        <p id="statusText" class="status-text">Waiting for input...</p>
+        <input type="text" id="urlInput" placeholder="Enter website URL (example: google.com)">
+        
+        <button onclick="checkConnectivity()" class="btn">Check Connectivity</button>
 
-        <button onclick="checkConnection()" class="btn">Check Connection</button>
+        <div id="resultBox" class="result hidden">
+            <h3 id="statusText"></h3>
+            <p id="pingText"></p>
+        </div>
     </div>
 </div>
 
